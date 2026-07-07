@@ -1,0 +1,53 @@
+---
+- name: Ensure project deployment directory exists
+  file:
+    path: /opt/cloud1
+    state: directory
+    mode: '0755'
+    owner: ubuntu
+    group: ubuntu
+
+- name: Ensure proxy directory structure exists
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+    owner: ubuntu
+    group: ubuntu
+  loop:
+    - /opt/cloud1/proxy
+    - /opt/cloud1/proxy/certs
+
+- name: Copy docker-compose.yml to the server
+  copy:
+    src: docker-compose.yml
+    dest: /opt/cloud1/docker-compose.yml
+    mode: '0644'
+
+- name: Copy Nginx configuration file
+  copy:
+    src: nginx.conf
+    dest: /opt/cloud1/proxy/nginx.conf
+    mode: '0644'
+
+- name: Copy SSL certificates for local testing
+  copy:
+    src: "{{ item }}"
+    dest: "/opt/cloud1/proxy/certs/{{ item }}"
+    mode: '0600'
+  loop:
+    - nginx.crt
+    - nginx.key
+
+- name: Copy environment variables file (.env)
+  copy:
+    src: .env
+    dest: /opt/cloud1/.env
+    mode: '0600'
+
+- name: Pull Docker images and start the Inception cluster
+  command:
+    cmd: docker compose up -d
+    chdir: /opt/cloud1
+  register: docker_output
+  changed_when: "'Started' in docker_output.stdout or 'Created' in docker_output.stdout"

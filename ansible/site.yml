@@ -1,0 +1,10 @@
+---
+- name: Deploy the Stack to Cloud Instance
+  hosts: webservers
+  become: yes
+  gather_facts: yes
+
+  roles:
+    - common
+    - docker
+    - deploy_stack

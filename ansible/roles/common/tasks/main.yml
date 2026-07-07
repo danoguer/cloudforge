@@ -1,0 +1,39 @@
+---
+- name: Update apt cache and upgrade packages
+  apt:
+    update_cache: yes
+    upgrade: dist
+    cache_valid_time: 3600
+
+- name: Install baseline system packages
+  apt:
+    name:
+     - curl
+     - git
+     - ufw
+     - python3-pip
+     - python3-setuptools
+    state: present
+
+- name: Configure UFW - Allow SSH traffic
+  ufw:
+    rule: allow
+    port: '22'
+    proto: tcp
+
+- name: Configure UFW - Allow HTTP traffic
+  ufw:
+    rule: allow
+    port: '80'
+    proto: tcp
+
+- name: Configure UFW - Allow HTTPS traffic
+  ufw:
+    rule: allow
+    port: '443'
+    proto: tcp
+
+- name: Enable UFW firewall and deny everything else
+  ufw:
+    state: enabled
+    policy: deny
