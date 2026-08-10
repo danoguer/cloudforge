@@ -38,8 +38,14 @@ jobs:
           python -m pip install --upgrade pip
           pip install ansible-lint ansible
 
+      - name: Create Dummy Vault Password for CI
+        run: echo "ci_dummy_password" > .vault_pass
+        working-directory: ./ansible
+
       - name: Check Ansible Playbook Syntax & Lint
         run: |
           ansible-playbook --syntax-check site.yml
           ansible-lint
         working-directory: ./ansible
+        env:
+          ANSIBLE_VAULT_PASSWORD_FILE: .vault_pass
