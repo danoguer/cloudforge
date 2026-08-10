@@ -14,24 +14,35 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - uses: hashicorp/setup-terraform@v3
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7
 
-      - name: Validate Terraform
-        run: |
-          terraform fmt -check
-          terraform init -backend=false
-          terraform validate
+      - name: Terraform Format Check
+        run: terraform fmt -check
         working-directory: ./terraform
 
-      - uses: actions/setup-python@v5
+      - name: Terraform Init
+        run: terraform init -backend=false
+        working-directory: ./terraform
+
+      - name: Terraform Validate
+        run: terraform validate
+        working-directory: ./terraform
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Validate Ansible Syntax
-        run: |
-          pip install ansible
-          echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
-          ansible-playbook --syntax-check site.yml --vault-password-file .vault_pass
+      - name: Install Ansible
+        run: pip install ansible
+
+      - name: Create Vault Pass File
+        run: echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
+        working-directory: ./ansible
+
+      - name: Ansible Syntax Check
+        run: ansible-playbook --syntax-check site.yml --vault-password-file .vault_pass
         working-directory: ./ansible
