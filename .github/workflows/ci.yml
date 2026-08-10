@@ -3,6 +3,8 @@ name: Infrastructure CI Pipeline
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
   lint-and-validate:
@@ -45,7 +47,7 @@ jobs:
       - name: Check Ansible Playbook Syntax & Lint
         run: |
           ansible-playbook --syntax-check site.yml
-          ansible-lint
+          ansible-lint --offline
         working-directory: ./ansible
         env:
           ANSIBLE_VAULT_PASSWORD_FILE: .vault_pass
