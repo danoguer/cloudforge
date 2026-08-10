@@ -1,31 +1,31 @@
 terraform {
-    required_providers {
-        aws = {
-            source = "hashicorp/aws"
-            version = "~> 5.0"
-        }
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
     }
+  }
 }
 
 provider "aws" {
-    region = var.aws_region
+  region = var.aws_region
 }
 
 data "aws_ami" "ubuntu" {
-    most_recent = true
-    owners      = ["099720109477"]
+  most_recent = true
+  owners      = ["099720109477"]
 
-    filter {
-        name    = "name"
-        values  = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
-    }
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-jammy-22.04-amd64-server-*"]
+  }
 }
 
 resource "aws_security_group" "cloud1_sg" {
-    name        = "cloud1-firewall-rules"
-    description = "Enforce perimeter restrictions for Cloud-1 project"
+  name        = "cloud1-firewall-rules"
+  description = "Enforce perimeter restrictions for Cloud-1 project"
 
-    ingress {
+  ingress {
     description = "Allow SSH communication"
     from_port   = 22
     to_port     = 22
@@ -58,13 +58,13 @@ resource "aws_security_group" "cloud1_sg" {
 }
 
 resource "aws_instance" "web_server" {
-    ami           = data.aws_ami.ubuntu.id
-    instance_type = var.instance_type
+  ami           = data.aws_ami.ubuntu.id
+  instance_type = var.instance_type
 
-    vpc_security_group_ids = [aws_security_group.cloud1_sg.id]
-    key_name = "cloud1-key"
+  vpc_security_group_ids = [aws_security_group.cloud1_sg.id]
+  key_name               = "cloud1-key"
 
-    tags = {
-        Name = "Cloud1-Inception-Host"
-    }
+  tags = {
+    Name = "Cloud1-Inception-Host"
+  }
 }
