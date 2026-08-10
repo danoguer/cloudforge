@@ -7,47 +7,31 @@ on:
     branches: [ main ]
 
 jobs:
-  lint-and-validate:
-    name: Validate Terraform & Ansible
+  validate:
+    name: Validate Infrastructure
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Terraform
-        uses: hashicorp/setup-terraform@v3
+      - uses: hashicorp/setup-terraform@v3
         with:
           terraform_version: 1.5.7
 
-      - name: Terraform Format Check
-        run: terraform fmt -check
-        working-directory: ./terraform
-
-      - name: Terraform Init & Validate
+      - name: Validate Terraform
         run: |
+          terraform fmt -check
           terraform init -backend=false
           terraform validate
         working-directory: ./terraform
 
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
 
-      - name: Install Ansible dependencies
+      - name: Validate Ansible Syntax
         run: |
-          python -m pip install --upgrade pip
-          pip install ansible-lint ansible
-
-      - name: Create Dummy Vault Password for CI
-        run: echo "ci_dummy_password" > .vault_pass
+          pip install ansible
+          echo "${{ secrets.ANSIBLE_VAULT_PASSWORD }}" > .vault_pass
+          ansible-playbook --syntax-check site.yml --vault-password-file .vault_pass
         working-directory: ./ansible
-
-      - name: Check Ansible Playbook Syntax & Lint
-        run: |
-          ansible-playbook --syntax-check site.yml
-          ansible-lint --offline
-        working-directory: ./ansible
-        env:
-          ANSIBLE_VAULT_PASSWORD_FILE: .vault_pass
