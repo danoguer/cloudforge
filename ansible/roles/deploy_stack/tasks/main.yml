@@ -39,11 +39,13 @@
     - nginx.crt
     - nginx.key
 
-- name: Copy environment variables file (.env)
-  copy:
-    src: .env
+- name: Renderize dynamic environment file from vault
+  ansible.builtin.template:
+    src: env.j2
     dest: /opt/cloud1/.env
     mode: '0600'
+    owner: ubuntu
+    group: ubuntu
 
 - name: Pull Docker images and start the Inception cluster
   command:
