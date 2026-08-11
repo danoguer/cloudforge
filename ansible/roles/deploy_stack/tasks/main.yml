@@ -1,6 +1,6 @@
 ---
 - name: Ensure project deployment directory exists
-  file:
+  ansible.builtin.file:
     path: /opt/cloud1
     state: directory
     mode: '0755'
@@ -8,7 +8,7 @@
     group: ubuntu
 
 - name: Ensure proxy directory structure exists
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: '0755'
@@ -19,25 +19,33 @@
     - /opt/cloud1/proxy/certs
 
 - name: Copy docker-compose.yml to the server
-  copy:
+  ansible.builtin.copy:
     src: docker-compose.yml
     dest: /opt/cloud1/docker-compose.yml
     mode: '0644'
 
 - name: Copy Nginx configuration file
-  copy:
+  ansible.builtin.copy:
     src: nginx.conf
     dest: /opt/cloud1/proxy/nginx.conf
     mode: '0644'
 
-- name: Copy SSL certificates for local testing
-  copy:
-    src: "{{ item }}"
-    dest: "/opt/cloud1/proxy/certs/{{ item }}"
+- name: Generate SSL certificate dynamically on target host
+  ansible.builtin.command:
+    cmd: >
+      openssl req -x509 -nodes -days 365 -newkey rsa:2048
+      -keyout /opt/cloud1/proxy/certs/nginx.key
+      -out /opt/cloud1/proxy/certs/nginx.crt
+      -subj "/CN=cloud1.local"
+      -addext "subjectAltName=DNS:localhost,DNS:cloud1.local,DNS:pma.cloud1.local,IP:{{ ansible_host }}"
+    creates: /opt/cloud1/proxy/certs/nginx.crt
+
+- name: Secure SSL private key permissions
+  ansible.builtin.file:
+    path: /opt/cloud1/proxy/certs/nginx.key
     mode: '0600'
-  loop:
-    - nginx.crt
-    - nginx.key
+    owner: ubuntu
+    group: ubuntu
 
 - name: Renderize dynamic environment file from vault
   ansible.builtin.template:
@@ -48,7 +56,7 @@
     group: ubuntu
 
 - name: Pull Docker images and start the Inception cluster
-  command:
+  ansible.builtin.command:
     cmd: docker compose up -d
     chdir: /opt/cloud1
   register: docker_output
