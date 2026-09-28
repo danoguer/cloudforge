@@ -1,10 +1,10 @@
-# 🚀 CloudForge — Automated AWS DevOps Infrastructure
+#  CloudForge — Automated AWS DevOps Infrastructure
 
 > An automated DevOps pipeline combining IaC and configuration management to deploy a secure, reproducible web stack (WordPress + phpMyAdmin + Nginx) on AWS using Terraform, Ansible, and Docker.
 
 ---
 
-## 💡 Why This Project?
+##  Why This Project?
 
 CloudForge demonstrates a reproducible deployment pipeline where infrastructure provisioning, host configuration, application deployment, and network security are handled as distinct, decoupled layers:
 
@@ -15,7 +15,7 @@ CloudForge demonstrates a reproducible deployment pipeline where infrastructure 
 
 ---
 
-## 📌 Overview
+##  Overview
 
 CloudForge replaces manual, error-prone server setups with an end-to-end automated pipeline. By providing AWS credentials and launching a single command, the project provisions cloud infrastructure, enforces host-level security configurations, generates the required TLS certificates, and spins up an isolated, containerized application environment on a fresh Ubuntu instance.
 
@@ -25,7 +25,7 @@ Deploy Command ➔ Terraform (AWS) ➔ Ansible (Host) ➔ Docker Compose (Stack)
 
 ---
 
-## 🏗️ Architecture
+##  Architecture
 
 ```text
                          AWS Cloud
@@ -68,7 +68,7 @@ graph LR
 
 ---
 
-## ✨ Key Features
+##  Key Features
 
 * **Infrastructure as Code (IaC):** Automated provisioning of EC2 instances, Security Groups, SSH key pairs, and public IP allocation using Terraform 1.5+.
 * **Secrets Management:** Environment variables and database credentials encrypted using Ansible Vault with strict `0600` file permissions.
@@ -77,7 +77,7 @@ graph LR
 
 ---
 
-## 🚀 Quick Start & Usage
+##  Quick Start & Usage
 
 ```bash
 # Clone repository
@@ -96,7 +96,7 @@ chmod +x deploy.sh destroy.sh
 
 ---
 
-## 🗺️ Roadmap
+##  Roadmap
 
 * [x] Terraform provisioning and Ansible automation
 * [x] Dynamic self-signed TLS certificate generation and Nginx Reverse Proxy
@@ -107,6 +107,6 @@ chmod +x deploy.sh destroy.sh
 
 ---
 
-## 📄 License
+##  License
 
 MIT
